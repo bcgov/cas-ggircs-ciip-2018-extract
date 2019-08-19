@@ -39,7 +39,7 @@ objects:
     source:
       git:
         ref: ${GIT_SHA1}
-        uri: https://github.com/bcgov/${PREFIX}-extract.git
+        uri: https://github.com/bcgov/${PREFIX}extract.git
       contextDir: extract
       type: Git
     strategy:

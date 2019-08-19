@@ -43,3 +43,4 @@ build: whoami
 .PHONY: install
 install: whoami
 	$(call oc_promote,$(PROJECT_PREFIX)extract)
+	$(call oc_deploy)
