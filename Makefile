@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 PATHFINDER_PREFIX := wksv3k
-PROJECT_PREFIX := cas-ggircs-ciip-2018-
+PROJECT_PREFIX := cas-ggircs-
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 include .pipeline/*.mk
@@ -38,9 +38,13 @@ configure: whoami
 build: $(call make_help,build,Builds the source into an image in the tools project namespace)
 build: OC_PROJECT=$(OC_TOOLS_PROJECT)
 build: whoami
-	$(call oc_build,$(PROJECT_PREFIX)extract)
+	$(call oc_build,$(PROJECT_PREFIX)ciip-2018-extract)
 
 .PHONY: install
 install: whoami
-	$(call oc_promote,$(PROJECT_PREFIX)extract)
+	$(call oc_promote,$(PROJECT_PREFIX)ciip-2018-extract)
 	$(call oc_deploy)
+
+.PHONY: install_test
+install_test: OC_PROJECT=$(OC_TEST_PROJECT)
+install_test: install

@@ -34,6 +34,7 @@ def extract_book(book_path, cursor):
 
 parser = argparse.ArgumentParser(description='Extracts data from CIIP excel application files and writes it to database')
 parser.add_argument('--dirslist', type=open)
+parser.add_argument('--dir')
 parser.add_argument('--db', default='ggircs_dev')
 parser.add_argument('--host', default='localhost')
 parser.add_argument('--user')
@@ -43,7 +44,11 @@ args = parser.parse_args()
 conn = psycopg2.connect(dbname=args.db, host=args.host, user=args.user, password=args.password)
 cur = conn.cursor()
 
-directories = args.dirslist.read().split('\n')
+directories = []
+if args.dirslist is not None:
+    directories = args.dirslist.read().split('\n')
+else:
+    directories = [args.dir]
 
 try:
     cur.execute("select swrs_transform.clone_schema('ciip_2018', 'ciip_2018_load', false);")

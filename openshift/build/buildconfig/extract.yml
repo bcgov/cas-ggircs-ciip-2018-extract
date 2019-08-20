@@ -20,7 +20,7 @@ objects:
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    name: ${PREFIX}extract
+    name: ${PREFIX}ciip-2018-extract
   spec:
     runPolicy: Parallel
     nodeSelector:
@@ -28,7 +28,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${PREFIX}extract:${GIT_SHA1}
+        name: ${PREFIX}ciip-2018-extract:${GIT_SHA1}
     resources:
       limits:
         cpu: "1"
@@ -39,7 +39,7 @@ objects:
     source:
       git:
         ref: ${GIT_SHA1}
-        uri: https://github.com/bcgov/${PREFIX}extract.git
+        uri: https://github.com/bcgov/${PREFIX}ciip-2018-extract.git
       contextDir: extract
       type: Git
     strategy:

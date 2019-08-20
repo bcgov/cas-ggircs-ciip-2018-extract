@@ -43,6 +43,8 @@ envDefaults: &envDefaults
       value: ${PREFIX}postgres
     - name: APP_SCRIPT
       value: "run-extract.sh"
+    - name: CIIP_FILES_DIR
+      value: "/opt/app-root/src/data/CIIP applications_2018/Complete CIIP data"
 
 objects:
 - apiVersion: v1
@@ -50,23 +52,23 @@ objects:
   metadata:
     annotations:
       template.alpha.openshift.io/wait-for-ready: "true"
-    name: ${PREFIX}extract
+    name: ${PREFIX}ciip-2018-extract
   spec:
     replicas: 1
     selector:
-      name: ${PREFIX}extract
+      name: ${PREFIX}ciip-2018-extract
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          name: ${PREFIX}extract
+          name: ${PREFIX}ciip-2018-extract
       spec:
         containers:
         - <<: *envDefaults
-          image: ${OC_REGISTRY}/${OC_PROJECT}/${PREFIX}extract:${GIT_SHA1}
+          image: ${OC_REGISTRY}/${OC_PROJECT}/${PREFIX}ciip-2018-extract:${GIT_SHA1}
           imagePullPolicy: IfNotPresent
-          name: ${PREFIX}extract
+          name: ${PREFIX}ciip-2018-extract
           resources:
             limits:
               cpu: 500m
@@ -80,16 +82,10 @@ objects:
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - mountPath: /opt/app-root/src/data
-            name: ${PREFIX}data
-          - mountPath: /opt/configs
-            name: ciip-extract-dirlist
+            name: ${PREFIX}ciip-2018-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
-        - name: ${PREFIX}data
+        - name: ${PREFIX}ciip-2018-data
           persistentVolumeClaim:
-            claimName: ${PREFIX}data
-        - configMap:
-            defaultMode: 420
-            name: ciip-extract-dirlist
-          name: ciip-extract-dirlist
+            claimName: ${PREFIX}ciip-2018-data

@@ -11,7 +11,7 @@ objects:
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    name: ${PREFIX}extract
+    name: ${PREFIX}ciip-2018-extract
   spec:
     lookupPolicy:
       local: true
