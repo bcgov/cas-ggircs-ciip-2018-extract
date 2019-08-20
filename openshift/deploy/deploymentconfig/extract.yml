@@ -93,5 +93,3 @@ objects:
             defaultMode: 420
             name: ciip-extract-dirlist
           name: ciip-extract-dirlist
-    triggers:
-      - type: ConfigChange
