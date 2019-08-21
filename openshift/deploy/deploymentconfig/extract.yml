@@ -84,7 +84,7 @@ objects:
           - mountPath: /opt/app-root/src/data
             name: ${PREFIX}ciip-2018-data
         dnsPolicy: ClusterFirst
-        restartPolicy: Always
+        restartPolicy: OnFailure
         volumes:
         - name: ${PREFIX}ciip-2018-data
           persistentVolumeClaim:
