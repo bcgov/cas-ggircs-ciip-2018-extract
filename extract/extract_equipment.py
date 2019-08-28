@@ -55,6 +55,7 @@ def extract(ciip_book, cursor, application_id, operator_id, facility_id):
                             val = float(val.replace('%', ''))
                         except:
                             print('Failed to convert ' + val + ' to float')
+                            val = None
                     elif len(eq) in numeric_cols:
                         try:
                             val = float(val)
