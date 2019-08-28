@@ -60,7 +60,7 @@ objects:
           - name: APP_SCRIPT
             value: "run-extract.sh"
           - name: CIIP_FILES_DIR
-            value: "/opt/app-root/src/data/CIIP applications_2018/Complete CIIP data"
+            value: "/opt/app-root/src/data/CIIP applications_2018/CIIP data_final"
           image: ${OC_REGISTRY}/${OC_PROJECT}/${PREFIX}ciip-2018-extract:${GIT_SHA1}
           name: ${PREFIX}ciip-2018-extract
           resources:
