@@ -1,0 +1,16 @@
+{{- if .Values.networkSecurityPolicies.enable }}
+kind: NetworkSecurityPolicy
+apiVersion: security.devops.gov.bc.ca/v1alpha1
+metadata:
+  name: {{ include "cas-ciip-2018-extract.name" . }}-ciip-access
+  labels:
+    release: {{ include "cas-ciip-2018-extract.labels" . | nindent 4 }}
+spec:
+  description: allow ciip to access this application
+  source:
+    - - $namespace={{ .Release.Namespace }}
+      - app.kubernetes.io/instance={{ include "cas-ciip-2018-extract.name" . }}
+  destination:
+    - - $namespace={{ .Release.Namespace }}
+      - release={{ .Values.ciip.release }}
+{{- end }}
