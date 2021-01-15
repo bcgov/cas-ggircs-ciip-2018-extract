@@ -2,7 +2,7 @@ import hashlib
 import dateutil.parser
 import datetime
 import ntpath
-from .model.application import Application
+from model.application import Application
 import util
 from util import get_sheet_value, search_row_index
 
@@ -32,4 +32,4 @@ def extract(ciip_book, cursor, book_path):
 
     application.save(cursor)
 
-    return application.id
+    return application

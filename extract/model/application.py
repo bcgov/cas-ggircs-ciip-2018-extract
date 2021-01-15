@@ -37,5 +37,5 @@ class Application:
             self.source_file_name, self.source_sha1, self.imported_at, self.application_year, self.application_type, self.signature_date
         )
     )
-    self.id = cursor.fetchone()[0].id
+    self.id = cursor.fetchone()[0]
     return self.id

@@ -1,11 +1,3 @@
-# from smart_open import open as smart_open
-# import builtins
-# import io
-
-# builtins.open = smart_open
-# io.open = smart_open
-
-import builtins
 import os
 import xlrd
 import argparse
@@ -19,14 +11,28 @@ import extract_equipment
 import extract_energy
 import extract_fuel
 import extract_emission
-from .create_reporting_year import create_2018_reporting_year
+from create_reporting_year import create_2018_reporting_year
+
+def print_values(cursor, statement, values):
+    for v in values:
+        print(statement % values)
+
+import psycopg2
+psycopg2.extras.execute_values = print_values
+
 
 class MockCursor:
+    static_id = 1
+    
     def __init__(self):
         return
 
     def execute(self, statement, format_args=()):
+        MockCursor.static_id += 1
         print(statement % format_args)
+
+    def fetchone(self):
+        return [MockCursor.static_id]
 
     def close(self):
         return
@@ -48,29 +54,24 @@ def extract_book(blob, cursor):
         os.makedirs('./tmp')
     fileName = './tmp/' + blob.name.replace("/", "_")
     blob.download_to_filename(fileName)
-
+    
     try:
         ciip_book = xlrd.open_workbook(fileName)
     except xlrd.biffh.XLRDError:
         print('skipping file ' + blob.name)
         return
 
-    application_id = extract_application.extract(ciip_book, cursor, fileName)
-    operator = extract_operator.extract(ciip_book, cursor, application_id)
-    facility = extract_facility.extract(
-        ciip_book, cursor, application_id, operator)
-    extract_contact_info.extract(
-        ciip_book, cursor, application_id, operator['id'], facility['id'])
-    extract_fuel.extract(ciip_book, cursor, application_id,
-                            operator['id'], facility['id'])
-    extract_energy.extract(
-        ciip_book, cursor, application_id, operator['id'], facility['id'])
-    extract_production.extract(
-        ciip_book, cursor, application_id, operator['id'], facility['id'])
-    extract_equipment.extract(
-        ciip_book, cursor, application_id, operator['id'], facility['id'])
-    extract_emission.extract(
-        ciip_book, cursor, application_id, operator['id'], facility['id'])
+    application = extract_application.extract(ciip_book, cursor, fileName)
+    operator = extract_operator.extract(ciip_book, cursor, application)
+    facility = extract_facility.extract(ciip_book, cursor, application, operator)
+    extract_contact_info.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    extract_fuel.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    extract_energy.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    extract_production.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    extract_equipment.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    extract_emission.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+
+    # Delete temp file?
 
     return
 
