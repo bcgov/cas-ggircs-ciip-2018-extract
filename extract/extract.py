@@ -65,7 +65,7 @@ def extract_book(blob, cursor):
     application = extract_application.extract(ciip_book, cursor, fileName)
     operator = extract_operator.extract(ciip_book, cursor, application)
     facility = extract_facility.extract(ciip_book, cursor, application, operator)
-    extract_contact_info.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    contact_info = extract_contact_info.extract(ciip_book)
     extract_fuel.extract(ciip_book, cursor, application.id, operator.id, facility.id)
     extract_energy.extract(ciip_book, cursor, application.id, operator.id, facility.id)
     extract_production.extract(ciip_book, cursor, application.id, operator.id, facility.id)
