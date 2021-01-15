@@ -36,8 +36,8 @@ def extract(ciip_book, cursor, application_id, operator):
         if res is not None and len(res) == 1:
             facility['swrs_facility_id'] = res[0][0]
 
-    # Outlier: This one facility is the same, except the facility_name in the swrs dataset does not contain 'Division'.
-    if facility['name'] == 'Soda Creek Division':
+    # Outlier: This partial facility name match is the only way to match this row in the ciip_2018 data to a swrs_id in the swrs data.
+    if 'oda cre' in facility['name'].lower():
         facility['swrs_facility_id'] = 14235
 
     if 'Production' in ciip_book.sheet_names():
