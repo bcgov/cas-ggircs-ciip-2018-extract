@@ -68,7 +68,7 @@ def extract_book(blob, cursor):
     extract_fuel.extract(ciip_book, cursor, application.id, operator.id, facility.id)
     extract_energy.extract(ciip_book, cursor, application.id, operator.id, facility.id)
     extract_production.extract(ciip_book, cursor, application.id, operator.id, facility.id)
-    extract_equipment.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    #extract_equipment.extract(ciip_book, cursor, application.id, operator.id, facility.id)
     extract_emission.extract(ciip_book, cursor, application.id, operator.id, facility.id)
 
     # Delete temp file?
