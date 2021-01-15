@@ -51,7 +51,7 @@
           },
           "bcCorporateRegistryNumber": {
               "type": "string",
-              "title": "BC Corporate Registry number",
+              "title": "BC Corporate Registry number"
           },
           "isBcCorpRegNumberValid": {
             "type": "boolean",
@@ -69,8 +69,8 @@
             "$ref": "#/definitions/contact",
             "title": "Operational Representative"
           },
-          "certifyingOfficial": {
-            "$ref": "#/definitions/contact",
+          "certifyingOfficial": {
+            "$ref": "#/definitions/contact",
             "title": "Certifying Official"
           }
         }
@@ -88,8 +88,8 @@
               "type": "string",
               "title": "Province or Territory"
           },
-          "postalCode": {
-            "type": "string",
+          "postalCode": {
+          "type": "string",
             "title": "Postal Code"
           },
           "streetAddress": {

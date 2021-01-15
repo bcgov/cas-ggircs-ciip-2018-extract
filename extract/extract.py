@@ -12,6 +12,7 @@ import extract_energy
 import extract_fuel
 import extract_emission
 from create_reporting_year import create_2018_reporting_year
+from create_json_schema_rows import create_2018_json_schema_forms
 
 def print_values(cursor, statement, values):
     for v in values:
@@ -97,6 +98,7 @@ cur = MockCursor()
 try:    
     cur.execute("select swrs_transform.clone_schema('ciip_2018', 'ciip_2018_load', false);")
     create_2018_reporting_year(cur)
+    create_2018_json_schema_forms(cur)
     for blob in gcs_blobs:
         print('parsing: ' + blob.name)
         extract_book(blob, cur)
