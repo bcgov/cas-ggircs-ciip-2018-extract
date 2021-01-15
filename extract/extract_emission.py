@@ -14,13 +14,13 @@ ciip_swim_gas_types = {
 }
 
 ciip_swim_emissions_categories = {
-    'Stationary Fuel Combustion Emissions ': 'BC_ScheduleB_GeneralStationaryCombustionEmissions',
-    'Venting Emissions': 'BC_ScheduleB_VentingEmissions',
-    'Flaring Emissions':'BC_ScheduleB_FlaringEmissions',
-    'Fugitive/Other Emissions': 'BC_ScheduleB_FugitiveEmissions',
-    'On-Site Transportation Emissions': 'BC_ScheduleB_OnSiteTransportationEmissions',
-    'Waste and Wastewater Emissions': 'BC_ScheduleB_WasteAndWastewaterEmissions',
-    'Industrial Process Emissions': 'BC_ScheduleB_IndustrialProcessEmissions',
+    'Stationary Fuel Combustion Emissions ': 'General Stationary Combustion',
+    'Venting Emissions': 'Venting',
+    'Flaring Emissions':'Flaring',
+    'Fugitive/Other Emissions': 'Fugitive',
+    'On-Site Transportation Emissions': 'On-Site Transportation',
+    'Waste and Wastewater Emissions': 'Waste and Wastewater',
+    'Industrial Process Emissions': 'Industrial Process'
 }
 
 def extract(ciip_book, cursor, application_id, operator_id, facility_id):
@@ -44,9 +44,6 @@ def extract(ciip_book, cursor, application_id, operator_id, facility_id):
                     application_id, operator_id, facility_id
                 )
             )
-
-
-
 
     psycopg2.extras.execute_values(
         cursor,
