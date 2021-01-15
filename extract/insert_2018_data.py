@@ -3,8 +3,35 @@ import util
 from util import get_sheet_value, none_if_not_number
 
 
-def modify_triggers(disable):
+def modify_triggers(cursor, action):
     # disable CIIP db triggers
+    cursor.execute(
+        '''
+        $do$
+          declare table_name text;
+          declare table_trigger text;
+          declare alter_statement text;
+          begin
+
+            for table_name, table_trigger in
+              select event_object_table as table_name, trigger_name as table_trigger
+              from information_schema.triggers
+              where event_object_schema='ggircs_portal'
+              order by table_name asc
+
+            loop
+              alter_statement:=concat('alter table ggircs_portal.', table_name, ' ', %s, ' trigger ', table_trigger);
+              execute alter_statement;
+            end loop;
+          end;
+
+        $do$
+        select distinct swrs_facility_id from swrs.identifier
+        where identifier_value = %s
+        ''',
+        (action)
+    )
+
 
 def validate_schema(form_result):
     # validate form_result data with form_json schema
@@ -35,8 +62,8 @@ def populate_form_results(application, facility, operator, contact, fuel, emissi
 
 
 def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy, equipment):
-    modify_triggers(True)
+    modify_triggers('disable')
     operator_details = reconcile_operator(operator, application)
     facility_details = reconcile_facility(operator_details, facility)
     application_details = create_application(facility_details, application)
-    modify_triggers(False)
+    modify_triggers('enable')
