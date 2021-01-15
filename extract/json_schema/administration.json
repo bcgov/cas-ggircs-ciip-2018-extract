@@ -74,6 +74,32 @@
             "title": "Certifying Official"
           }
         }
+      },
+      "applicationMetadata" :{
+        "type": "object",
+        "title": "Additional Application Data",
+        "properties":{
+          "sourceFileName":{
+            "type": "string",
+            "title": "Source File"
+          },
+          "sourceSHA1":{
+            "type": "string",
+            "title": "Source File SHA1"
+          },
+          "importedAt":{
+            "type": "string",
+            "title": "Imported At"
+          },
+          "applicationType":{
+            "type": "string",
+            "title": "Application Type"
+          },
+          "signatureDate":{
+            "type": "string",
+            "title": "Signature Date"
+          }
+        }
       }
     },
     "definitions": {
