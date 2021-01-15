@@ -9,8 +9,8 @@ ciip_swim_gas_types = {
     'Methane (CH4)': 'CH4',
     'Nitrous oxide (N2O)': 'N2O',
     'Sulfur Hexafluoride (SF6)': 'SF6',
-    'Perfluoromethane (CF4)': 'Perfluoromethane_CF4',
-    'Perfluoroethane (C2F6)':'Perfluoroethane_C2F6',
+    'Perfluoromethane (CF4)': 'CF4',
+    'Perfluoroethane (C2F6)':'C2F6',
 }
 
 ciip_swim_emissions_categories = {
