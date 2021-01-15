@@ -48,6 +48,4 @@ def extract(ciip_book, cursor, application, operator):
         facility.production_additional_info = get_sheet_value(production_sheet, 51, 2)
         facility.production_public_info = get_sheet_value(production_sheet, 55, 2)
 
-    facility.save(cursor)
-
     return facility

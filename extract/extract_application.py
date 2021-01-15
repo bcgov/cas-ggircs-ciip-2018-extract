@@ -29,7 +29,5 @@ def extract(ciip_book, cursor, book_path):
                         application_type, 
                         signature_date
                     )
-
-    application.save(cursor)
-
+                    
     return application
