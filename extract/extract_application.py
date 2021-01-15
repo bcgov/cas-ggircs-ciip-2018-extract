@@ -6,7 +6,7 @@ from model.application import Application
 import util
 from util import get_sheet_value, search_row_index
 
-def extract(ciip_book, cursor, book_path):
+def extract(ciip_book, book_path):
     hasher = hashlib.sha1()
     with open(book_path, 'rb') as afile:
         buf = afile.read()
@@ -29,5 +29,5 @@ def extract(ciip_book, cursor, book_path):
                         application_type, 
                         signature_date
                     )
-                    
+
     return application
