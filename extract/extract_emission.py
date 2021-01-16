@@ -1,4 +1,5 @@
-import psycopg2
+import itertools
+import json
 import util
 from util import get_sheet_value, zero_if_not_number
 
@@ -23,7 +24,7 @@ ciip_swim_emissions_categories = {
     'Industrial Process Emissions': 'Industrial Process'
 }
 
-def extract(ciip_book, cursor, application_id, operator_id, facility_id):
+def extract(ciip_book):
     emissions_sheet = ciip_book.sheet_by_name('Emissions')
     emissions = []
 
@@ -36,20 +37,14 @@ def extract(ciip_book, cursor, application_id, operator_id, facility_id):
         else :
             quantity = zero_if_not_number(get_sheet_value(emissions_sheet, row, 4))
             emissions.append(
-                (
-                    current_emission_cat,
-                    ciip_swim_gas_types.get(get_sheet_value(emissions_sheet, row, 1)),
-                    quantity,
-                    zero_if_not_number(get_sheet_value(emissions_sheet, row, 8)),
-                    application_id, operator_id, facility_id
-                )
+                {
+                    "sourceTypeName" : current_emission_cat,
+                    "gasType" : ciip_swim_gas_types.get(get_sheet_value(emissions_sheet, row, 1)),
+                    "annualEmission" : quantity,
+                    "annualC02e" : zero_if_not_number(get_sheet_value(emissions_sheet, row, 8))
+                }
             )
 
-    psycopg2.extras.execute_values(
-        cursor,
-        '''insert into ciip_2018_load.emission(
-            emission_category, gas_type, quantity, calculated_quantity,
-            application_id, operator_id, facility_id)
-        values %s''',
-        emissions
-    )
+    non_zero_emissions = filter(lambda e : e['annualEmission'] != 0 or e['annualC02e'] != 0, emissions)
+
+    return {sourceType:list(gases) for sourceType,gases in itertools.groupby(non_zero_emissions, lambda emission : emission['sourceTypeName'])}
