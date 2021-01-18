@@ -11,8 +11,7 @@
           "properties": {
               "bcghgid": {
                   "type": "string",
-                  "title": "BCGHG ID Number",
-                  "format": "bcghgid"
+                  "title": "BCGHG ID Number"
               },
               "facilityName": {
                   "type": "string",
@@ -38,8 +37,7 @@
           },
           "naics": {
               "type": "string",
-              "title": "NAICS code",
-              "format": "naics"
+              "title": "NAICS code"
           },
           "tradeName": {
               "type": "string",
