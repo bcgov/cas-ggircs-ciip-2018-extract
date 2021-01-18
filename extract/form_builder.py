@@ -64,10 +64,14 @@ class FormBuilder:
 
     for sourceTypeName in emission_data:
 
+      gases = emission_data[sourceTypeName]
+      for g in gases:
+        del g['sourceTypeName']
+      
       sourceTypes.append(
         {
           "sourceTypeName": sourceTypeName,
-          "gases" : list(map(lambda gas_data : remove_key_from_dict(gas_data, 'sourceTypeName'), emission_data[sourceTypeName]))
+          "gases" : gases
         }
       )
 
