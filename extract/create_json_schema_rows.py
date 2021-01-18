@@ -9,11 +9,18 @@ def load_json_form(path):
 
 
 def insert(cursor, data):
-  statement = """
-    insert into ggircs_portal.form_json (name, slug, short_name, description, form_json, prepopulate_from_ciip, prepopulate_from_swrs, created_at)
-    values (%s,%s,%s,%s,%s,false,false,now())
-  """
-  cursor.execute((statement), data)
+  cursor.execute(
+      '''
+      select slug from ggircs_portal.form_json where slug ilike '%2018' limit 1;
+      '''
+  )
+  res = cursor.fetchone()
+  if res is None:
+      statement = """
+        insert into ggircs_portal.form_json (name, slug, short_name, description, form_json, prepopulate_from_ciip, prepopulate_from_swrs, created_at)
+        values (%s,%s,%s,%s,%s,false,false,now())
+      """
+      cursor.execute((statement), data)
 
 
 def create_2018_json_schema_forms(cursor):

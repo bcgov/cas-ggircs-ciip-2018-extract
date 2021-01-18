@@ -67,7 +67,7 @@ class FormBuilder:
       gases = emission_data[sourceTypeName]
       for g in gases:
         del g['sourceTypeName']
-      
+
       sourceTypes.append(
         {
           "sourceTypeName": sourceTypeName,
@@ -91,12 +91,12 @@ class FormBuilder:
     for fuel in fuel_data:
       form.append({
         "comments" : "",
-        "fuelType" : fuel.fuel_type,
-        "fuelTypeAlt" : fuel.fuel_type_alt,
-        "fuelDescription" : fuel.fuel_description,
-        "quantity" : fuel.quantity,
-        "fuelUnits" : fuel.fuel_units,
-        "associatedEmissions" : fuel.carbon_emissions
+        "fuelType" : fuel['fuel_type'],
+        "fuelTypeAlt" : fuel['fuel_type_alt'],
+        "fuelDescription" : fuel['fuel_description'],
+        "quantity" : fuel['quantity'],
+        "fuelUnits" : fuel['fuel_units'],
+        "associatedEmissions" : fuel['carbon_emissions']
       })
 
     FormBuilder.validate_form(form, 'fuel.json')

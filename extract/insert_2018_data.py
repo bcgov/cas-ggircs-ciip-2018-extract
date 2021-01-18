@@ -146,7 +146,7 @@ def populate_form_results(cursor, application, facility, operator, contact, fuel
     admin_form = FormBuilder.build_administration_form(operator, contact, facility, application)
     cursor.execute(
         '''
-        update ggircs_portal.form_result set form_result=%s
+        update ggircs_portal.form_result set form_result=%s, updated_at='2019-07-01 00:00:00-07'
         where application_id=%s
         and version_number=1
         and form_id = (select id from ggircs_portal.form_json where slug='admin-2018');
@@ -157,7 +157,7 @@ def populate_form_results(cursor, application, facility, operator, contact, fuel
     emission_form = FormBuilder.build_emission_form(emission)
     cursor.execute(
         '''
-        update ggircs_portal.form_result set form_result=%s
+        update ggircs_portal.form_result set form_result=%s, updated_at='2019-07-01 00:00:00-07'
         where application_id=%s
         and version_number=1
         and form_id = (select id from ggircs_portal.form_json where slug='emission-2018');
@@ -168,7 +168,7 @@ def populate_form_results(cursor, application, facility, operator, contact, fuel
     fuel_form = FormBuilder.build_fuel_form(fuel)
     cursor.execute(
         '''
-        update ggircs_portal.form_result set form_result=%s
+        update ggircs_portal.form_result set form_result=%s, updated_at='2019-07-01 00:00:00-07'
         where application_id=%s
         and version_number=1
         and form_id = (select id from ggircs_portal.form_json where slug='fuel-2018');
@@ -179,7 +179,7 @@ def populate_form_results(cursor, application, facility, operator, contact, fuel
     prod_form = FormBuilder.build_production_form(production, energy)
     cursor.execute(
         '''
-        update ggircs_portal.form_result set form_result=%s
+        update ggircs_portal.form_result set form_result=%s, updated_at='2019-07-01 00:00:00-07'
         where application_id=%s
         and version_number=1
         and form_id = (select id from ggircs_portal.form_json where slug='production-2018');
