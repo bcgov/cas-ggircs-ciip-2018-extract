@@ -1,4 +1,5 @@
 from model.facility import Facility
+import json
 from create_json_schema_rows import create_2018_json_schema_forms
 from create_reporting_year import create_2018_reporting_year
 from form_builder import FormBuilder
@@ -34,7 +35,7 @@ def modify_triggers(cursor, action):
 def validate_schema(form_result):
     # validate form_result data with form_json schema
 
-def reconcile_operator(operator):
+def find_or_create_operator(operator):
     # Get id of operator in CIIP db || create operator in CIIP db
     # CIIP db id & all operator info
     cursor.execute(
@@ -58,9 +59,9 @@ def reconcile_operator(operator):
         res = cursor.fetchone()
         operator['ciip_db_id'] = res[0]
 
-def reconcile_facility(operator, facility):
+def find_or_create_facility(operator, facility):
     # Get id of facility in CIIP db || create facility in CIIP db
-    # Check that the organisation_id in CIIP db = id from reconcile_operator
+    # Check that the organisation_id in CIIP db = id from find_or_create_operator
     # CIIP db id & all fac info
 
     cursor.execute(
@@ -142,22 +143,62 @@ def create_application(facility, application):
             ''',
             (form_id, app_id, 1, 'approved', '2019-07-01 00:00:00-07')
         )
+    return app_id
 
 
-def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy):
+def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, application_id):
     # Parse data from these objects into form_result table with appropriate form_id
-    FormBuilder.build_administration_form(operator, contact, facility, application)
-    FormBuilder.build_emission_form(emission)
-    FormBuilder.build_fuel_form(fuel)
-    FormBuilder.build_production_form(production, energy)
-
-
+    # Admin form
+    admin_form = FormBuilder.build_administration_form(operator, contact, facility, application)
+    cursor.execute(
+        '''
+        update ggircs_portal.form_result set form_result=%s
+        where application_id=%d
+        and version_number=1
+        and form_id = (select id from ggircs_portal.form_json where slug='admin-2018');
+        ''',
+        (json.dumps(admin_form), application_id)
+    )
+    # Emission form
+    emission_form = FormBuilder.build_emission_form(emission)
+    cursor.execute(
+        '''
+        update ggircs_portal.form_result set form_result=%s
+        where application_id=%d
+        and version_number=1
+        and form_id = (select id from ggircs_portal.form_json where slug='emission-2018');
+        ''',
+        (json.dumps(emission_form), application_id)
+    )
+    # Fuel form
+    fuel_form = FormBuilder.build_fuel_form(fuel)
+    cursor.execute(
+        '''
+        update ggircs_portal.form_result set form_result=%s
+        where application_id=%d
+        and version_number=1
+        and form_id = (select id from ggircs_portal.form_json where slug='fuel-2018');
+        ''',
+        (json.dumps(fuel_form), application_id)
+    )
+    # Production form
+    prod_form = FormBuilder.build_production_form(production, energy)
+    cursor.execute(
+        '''
+        update ggircs_portal.form_result set form_result=%s
+        where application_id=%d
+        and version_number=1
+        and form_id = (select id from ggircs_portal.form_json where slug='production-2018');
+        ''',
+        (json.dumps(prod_form), application_id)
+    )
 
 def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy):
     modify_triggers('disable')
 
-    operator_details = reconcile_operator(operator, application)
-    facility_details = reconcile_facility(operator_details, facility)
-    application_details = create_application(facility_details, application)
+    find_or_create_operator(operator, application)
+    find_or_create_facility(operator, facility)
+    application_id = create_application(facility, application)
+    populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, application_id)
 
     modify_triggers('enable')
