@@ -51,6 +51,14 @@ def reconcile_operator(operator):
             ''',
             (2018, operator['legal_name'], operator['trade_name'], operator['duns'])
         )
+        # Get ID of newly created row & save to operator object
+        cursor.execute(
+            '''
+            select id from ggircs_portal.facility order by id desc limit 1;
+            '''
+        )
+        res = cursor.fetchone()
+        operator['ciip_db_id'] = res[0]
 
 def reconcile_facility(operator, facility):
     # Get id of facility in CIIP db || create facility in CIIP db
@@ -73,10 +81,18 @@ def reconcile_facility(operator, facility):
         cursor.execute(
             '''
             insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
-            values ((select id from ggircs_portal.organisation order by id desc limit 1), %s, %s, %s);
+            values (%d, %s, %s, %s);
             ''',
-            (facility['name'], facility['type'], facility['bcghg_id'])
+            (operator['ciip_db_id'], facility['name'], facility['type'], facility['bcghg_id'])
         )
+        # Get ID of newly created row & save to facility object
+        cursor.execute(
+            '''
+            select id from ggircs_portal.facility order by id desc limit 1;
+            '''
+        )
+        res = cursor.fetchone()
+        facility['ciip_db_id'] = res[0]
 
 def create_application(facility, application):
     # Fully manual, create: application, application_revision, application_revision_status='approved', form_result, form_result_status='approved' X ?
