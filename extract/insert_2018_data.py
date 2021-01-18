@@ -1,4 +1,6 @@
 from model.facility import Facility
+from create_json_schema_rows import create_2018_json_schema_forms
+from create_reporting_year import create_2018_reporting_year
 import util
 from util import get_sheet_value, none_if_not_number
 
@@ -153,7 +155,12 @@ def populate_form_results(application, facility, operator, contact, fuel, emissi
 
 def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy, equipment):
     modify_triggers('disable')
+    create_2018_reporting_year(cursor)
+    create_2018_json_schema_forms(cursor)
+    
+    
     operator_details = reconcile_operator(operator, application)
     facility_details = reconcile_facility(operator_details, facility)
     application_details = create_application(facility_details, application)
+
     modify_triggers('enable')
