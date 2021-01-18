@@ -4,12 +4,39 @@ import requests
 import util
 from util import get_sheet_value, none_if_not_number
 
+def normalize_name(raw):
+  normalized_abbrev = {
+    'ltd'   : 'limited',
+    'inc'   : 'incorporated',
+    'corp'  : 'corporation'
+  }
+
+  raw_name = str(raw)
+
+  normalized_name = str(raw_name).lower().strip('.')
+  for key, value in normalized_abbrev.items():
+    normalized_name.replace(key, value)
+
+  return normalized_name
+
+def get_swrs_id_by_name(operator, cursor):
+    cursor.execute(
+        """
+        select swrs_organisation_id, business_legal_name, english_trade_name from swrs.organisation
+        """
+    )
+    res=cursor.fetchall()
+    for row in res:
+        if normalize_name(operator['legal_name']) == normalize_name(row[1]) or normalize_name(operator['trade_name']) == normalize_name(row[2]):
+            operator['swrs_operator_id'] = row[0]
+
 def extract(ciip_book, cursor, application_id):
     admin_sheet = ciip_book.sheet_by_name('Administrative Info')
 
     duns = get_sheet_value(admin_sheet, 8, 1)
     if type(duns) is str:
         duns = duns.replace('-', '')
+        duns = duns.replace(' ', '')
     elif duns is not None:
         duns = str(int(duns))
 
@@ -45,6 +72,10 @@ def extract(ciip_book, cursor, application_id):
         res = cursor.fetchone()
         if res is not None:
             operator['swrs_operator_id'] = res[0]
+        else:
+            get_swrs_id_by_name(operator, cursor)
+    else:
+        get_swrs_id_by_name(operator, cursor)
 
     cursor.execute(
         ('insert into ciip_2018_load.operator '

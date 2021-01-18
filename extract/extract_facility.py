@@ -28,14 +28,17 @@ def extract(ciip_book, cursor, application_id, operator):
         cursor.execute(
             '''
             select distinct swrs_facility_id from swrs.facility
-            where facility_name = %s
+            where lower(facility_name) = %s
             ''',
-            (facility['name'],)
+            (str(facility['name']).lower(),)
         )
         res = cursor.fetchall()
         if res is not None and len(res) == 1:
             facility['swrs_facility_id'] = res[0][0]
 
+    # Outlier: This partial facility name match is the only way to match this row in the ciip_2018 data to a swrs_id in the swrs data.
+    if 'oda cre' in facility['name'].lower():
+        facility['swrs_facility_id'] = 14235
 
     if 'Production' in ciip_book.sheet_names():
         production_sheet = ciip_book.sheet_by_name('Production')
