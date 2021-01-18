@@ -2,7 +2,7 @@ import os
 import xlrd
 import argparse
 import json
-# from google.cloud import storage
+from google.cloud import storage
 import extract_application
 import extract_operator
 import extract_facility
