@@ -146,19 +146,15 @@ def create_application(facility, application):
 
 def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy):
     # Parse data from these objects into form_result table with appropriate form_id
-
     FormBuilder.build_administration_form(operator, contact, facility, application)
     FormBuilder.build_emission_form(emission)
     FormBuilder.build_fuel_form(fuel)
     FormBuilder.build_production_form(production, energy)
 
-    validate_schema()
+
 
 def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy):
     modify_triggers('disable')
-    create_2018_reporting_year(cursor)
-    create_2018_json_schema_forms(cursor)
-
 
     operator_details = reconcile_operator(operator, application)
     facility_details = reconcile_facility(operator_details, facility)

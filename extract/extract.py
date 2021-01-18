@@ -14,6 +14,7 @@ import extract_fuel
 import extract_emission
 from create_reporting_year import create_2018_reporting_year
 from create_json_schema_rows import create_2018_json_schema_forms
+from insert_2018_data import insert_data
 
 
 # The env variable GOOGLE_APPLICATION_CREDENTIALS needs to point at a json file with the gcs credentials
@@ -40,9 +41,9 @@ def extract_book(blob, cursor):
         print('skipping file ' + blob.name)
         return
 
-    facility = extract_facility.extract(ciip_book, cursor)
+    operator = extract_operator.extract(ciip_book, cursor)
+    facility = extract_facility.extract(ciip_book, cursor, operator)
     application = extract_application.extract(ciip_book, fileName, facility)
-    operator = extract_operator.extract(ciip_book, cursor, application)
     
     contact_info = extract_contact_info.extract(ciip_book)
     fuel = extract_fuel.extract(ciip_book)
@@ -50,40 +51,29 @@ def extract_book(blob, cursor):
     products = extract_production.extract(ciip_book)
     emissions = extract_emission.extract(ciip_book)
 
-    # Delete temp file?
+    insert_data(cursor, operator, facility, application, contact_info, fuel, emissions, products, energy_products)
 
     return
 
 
-parser = argparse.ArgumentParser(
-    description='Extracts data from CIIP excel application files and writes it to database')
-parser.add_argument('--bucket', default='ciip-2018')
-parser.add_argument(
-    '--prefix', default='CIIP applications_2018/CIIP data_final')
-# parser.add_argument('--db', default='ggircs_dev')
-# parser.add_argument('--host', default='localhost')
-# parser.add_argument('--user')
-# parser.add_argument('--password')
-args = parser.parse_args()
 
-# conn = psycopg2.connect(dbname=args.db, host=args.host, user=args.user, password=args.password)
-# cur = conn.cursor()
+conn = psycopg2.connect(dbname='args.db', host=args.host, user=args.user, password=args.password)
+cur = conn.cursor()
 
-gcs_blobs = list_blobs_in_bucket(args.bucket, args.prefix)[:2]
+gcs_blobs = list_blobs_in_bucket("ciip-2018", 'CIIP applications_2018/CIIP data_final')[:2]
 
 try:    
-    cur.execute("select swrs_transform.clone_schema('ciip_2018', 'ciip_2018_load', false);")
     create_2018_reporting_year(cur)
     create_2018_json_schema_forms(cur)
+
     for blob in gcs_blobs:
         print('parsing: ' + blob.name)
         extract_book(blob, cur)
-    cur.execute('drop schema ciip_2018 cascade;')
-    cur.execute('alter schema ciip_2018_load rename to ciip_2018;')
-    # conn.commit()
+
+    conn.commit()
 except Exception as e:
-    # conn.rollback()
+    conn.rollback()
     raise e
 finally:
     cur.close()
-    # conn.close()
+    conn.close()

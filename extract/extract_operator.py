@@ -31,8 +31,9 @@ def get_swrs_id_by_name(operator, cursor):
         if normalize_name(operator['legal_name']) == normalize_name(row[1]) or normalize_name(operator['trade_name']) == normalize_name(row[2]):
             operator['swrs_operator_id'] = row[0]
 
-def extract(ciip_book, cursor, application):
-    operator = Operator(application)
+def extract(ciip_book, cursor):
+    operator = Operator()
+    
     admin_sheet = ciip_book.sheet_by_name('Administrative Info')
 
     duns = get_sheet_value(admin_sheet, 8, 1)
