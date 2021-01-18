@@ -1,6 +1,7 @@
 import os
 import xlrd
 import argparse
+import json
 from google.cloud import storage
 import extract_application
 import extract_operator
@@ -14,29 +15,6 @@ import extract_emission
 from create_reporting_year import create_2018_reporting_year
 from create_json_schema_rows import create_2018_json_schema_forms
 
-def print_values(cursor, statement, values):
-    for v in values:
-        print(statement % values)
-
-import psycopg2
-psycopg2.extras.execute_values = print_values
-
-
-class MockCursor:
-    static_id = 1
-    
-    def __init__(self):
-        return
-
-    def execute(self, statement, format_args=()):
-        MockCursor.static_id += 1
-        print(statement % format_args)
-
-    def fetchone(self):
-        return [MockCursor.static_id]
-
-    def close(self):
-        return
 
 # The env variable GOOGLE_APPLICATION_CREDENTIALS needs to point at a json file with the gcs credentials
 # "gs://ciip-2018/CIIP applications_2018/CIIP data_final"
@@ -62,15 +40,14 @@ def extract_book(blob, cursor):
         print('skipping file ' + blob.name)
         return
 
-    application = extract_application.extract(ciip_book, cursor, fileName)
+    application = extract_application.extract(ciip_book, fileName)
     operator = extract_operator.extract(ciip_book, cursor, application)
     facility = extract_facility.extract(ciip_book, cursor, application, operator)
     contact_info = extract_contact_info.extract(ciip_book)
-    extract_fuel.extract(ciip_book, cursor, application.id, operator.id, facility.id)
-    extract_energy.extract(ciip_book, cursor, application.id, operator.id, facility.id)
-    extract_production.extract(ciip_book, cursor, application.id, operator.id, facility.id)
-    #extract_equipment.extract(ciip_book, cursor, application.id, operator.id, facility.id)
-    extract_emission.extract(ciip_book, cursor, application.id, operator.id, facility.id)
+    fuel = extract_fuel.extract(ciip_book)
+    energy_products = extract_energy.extract(ciip_book)
+    products = extract_production.extract(ciip_book)
+    emissions = extract_emission.extract(ciip_book)
 
     # Delete temp file?
 
@@ -92,8 +69,6 @@ args = parser.parse_args()
 # cur = conn.cursor()
 
 gcs_blobs = list_blobs_in_bucket(args.bucket, args.prefix)[:2]
-
-cur = MockCursor()
 
 try:    
     cur.execute("select swrs_transform.clone_schema('ciip_2018', 'ciip_2018_load', false);")
