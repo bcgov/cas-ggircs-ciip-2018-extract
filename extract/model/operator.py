@@ -11,6 +11,8 @@ class Operator:
   is_registration_active = None
   swrs_operator_id = None
 
+  ciip_db_id = None
+
   # TODO: address of the operator?
 
   def save(self, cursor):
@@ -26,7 +28,7 @@ class Operator:
         2018,
         self.legal_name,
         self.trade_name,
-        self.duns        
+        self.duns
       )
     )
     self.id = cursor.fetchone()[0]

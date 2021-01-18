@@ -15,6 +15,8 @@ class Facility:
   production_additional_info = None
   production_public_info = None
 
+  ciip_db_id = None
+
   def __init__(self, operator):
     self.operator = operator
     return
