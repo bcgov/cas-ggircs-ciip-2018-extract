@@ -23,11 +23,11 @@ def extract(ciip_book, book_path, facility):
 
     application = Application(
                         facility,
-                        ntpath.basename(book_path), 
-                        hasher.hexdigest(), 
+                        ntpath.basename(book_path),
+                        hasher.hexdigest(),
                         datetime.datetime.now(),
-                        2018, 
-                        application_type, 
+                        2018,
+                        application_type,
                         signature_date
                     )
 

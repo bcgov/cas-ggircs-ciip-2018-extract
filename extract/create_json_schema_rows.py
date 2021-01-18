@@ -6,18 +6,18 @@ def load_json_form(path):
     # We just try to load the file in a JSON object
     json_form = json.load(json_file)
     return json.dumps(json_form)
-  
+
 
 def insert(cursor, data):
   statement = """
-    insert into ggircs_portal.form_result (name, slug, short_name, description, form_json)
-    values (%s,%s,%s,%s,%s)
+    insert into ggircs_portal.form_json (name, slug, short_name, description, form_json, prepopulate_from_ciip, prepopulate_from_swrs, created_at)
+    values (%s,%s,%s,%s,%s,false,false,now())
   """
   cursor.execute((statement), data)
 
 
 def create_2018_json_schema_forms(cursor):
-  
+
   # Admin form
   admin_json_form = load_json_form("./json_schema/administration.json")
   admin_data = (
@@ -28,7 +28,7 @@ def create_2018_json_schema_forms(cursor):
     admin_json_form
   )
   insert(cursor, admin_data)
-  
+
   # Emission form
   emission_json_form = load_json_form("./json_schema/emission.json")
   emission_data = (

@@ -6,11 +6,11 @@ def extract(ciip_book, cursor, operator):
     facility = Facility(operator)
 
     admin_sheet = ciip_book.sheet_by_name('Administrative Info')
-  
+
     bcghg_id = str(get_sheet_value(admin_sheet, 8, 3)).replace('.0', '').strip() if get_sheet_value(admin_sheet, 8, 3) is not None else None
-    
+
     facility.name = get_sheet_value(admin_sheet, 30, 1, operator.trade_name)
-    facility.bcghg_id = bcghg_id
+    facility.bcghg_id = str(bcghg_id)
     facility.type = get_sheet_value(admin_sheet, 32, 1)
     facility.naics = int(get_sheet_value(admin_sheet, 32, 3, get_sheet_value(admin_sheet, 10, 3, 0)))
     facility.description = get_sheet_value(admin_sheet, 42, 1) if admin_sheet.nrows >= 43 else None
@@ -20,7 +20,7 @@ def extract(ciip_book, cursor, operator):
         select distinct swrs_facility_id from swrs.identifier
         where identifier_value = %s
         ''',
-        (facility.bcghg_id)
+        (facility.bcghg_id,)
     )
 
     res = cursor.fetchone()
@@ -32,7 +32,7 @@ def extract(ciip_book, cursor, operator):
             select distinct swrs_facility_id from swrs.facility
             where lower(facility_name) = %s
             ''',
-            (str(facility['name']).lower(),)
+            (facility.name,)
         )
         res = cursor.fetchall()
         if res is not None and len(res) == 1:

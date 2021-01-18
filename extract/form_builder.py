@@ -1,10 +1,10 @@
 from jsonschema import validate
 import json
-from extract.model.application import Application
-from extract.model.facility import Facility
-from extract.model.operator import Operator
+from model.application import Application
+from model.facility import Facility
+from model.operator import Operator
 
-from .util import remove_key_from_dict
+from util import remove_key_from_dict
 
 class FormBuilder:
 
@@ -57,13 +57,13 @@ class FormBuilder:
 
   def build_emission_form(emission_data):
 
-    # Emission is a dictionary 
+    # Emission is a dictionary
     #    keys are the source type names
     #    values are lists of gases for that source type
     sourceTypes = []
 
     for sourceTypeName in emission_data:
-      
+
       sourceTypes.append(
         {
           "sourceTypeName": sourceTypeName,
@@ -105,4 +105,3 @@ class FormBuilder:
 
     return form
 
-  
