@@ -47,16 +47,11 @@ def reconcile_operator(operator):
         cursor.execute(
             '''
             insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
-            values (%d, %s, %s, %s);
+            values (%d, %s, %s, %s) returning id;
             ''',
             (2018, operator['legal_name'], operator['trade_name'], operator['duns'])
         )
         # Get ID of newly created row & save to operator object
-        cursor.execute(
-            '''
-            select id from ggircs_portal.facility order by id desc limit 1;
-            '''
-        )
         res = cursor.fetchone()
         operator['ciip_db_id'] = res[0]
 
@@ -81,23 +76,60 @@ def reconcile_facility(operator, facility):
         cursor.execute(
             '''
             insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
-            values (%d, %s, %s, %s);
+            values (%d, %s, %s, %s) returning id;
             ''',
             (operator['ciip_db_id'], facility['name'], facility['type'], facility['bcghg_id'])
         )
         # Get ID of newly created row & save to facility object
-        cursor.execute(
-            '''
-            select id from ggircs_portal.facility order by id desc limit 1;
-            '''
-        )
         res = cursor.fetchone()
         facility['ciip_db_id'] = res[0]
 
 def create_application(facility, application):
     # Fully manual, create: application, application_revision, application_revision_status='approved', form_result, form_result_status='approved' X ?
-    cursor.execute(insert blah blah application)
-
+    # Create row in ggircs_portal.application
+    cursor.execute(
+        '''
+        insert into ggircs_portal.application(facility_id, reporting_year)
+        values (%d, %d) returning id;
+        ''',
+        (facility['ciip_db_id'], 2018)
+    )
+    res = cursor.fetchone()
+    app_id = res[0]
+    # Create row in ggircs_portal.application_revision
+    cursor.execute(
+        '''
+        insert into ggircs_portal.application_revision(application_id, version_number, legal_disclaimer_accepted, created_at)
+        values (%d, %d, %s, %s);
+        ''',
+        (app_id, 1, 't', '2019-07-01 00:00:00-07')
+    )
+    # Create row in ggircs_portal.application_revision_status
+    cursor.execute(
+        '''
+        insert into ggircs_portal.application_revision_status(application_id, version_number, application_revision_status, created_at)
+        values (%d, %d, %s, %s);
+        ''',
+        (app_id, 1, 'approved', '2019-07-01 00:00:00-07')
+    )
+    # Create rows in ggircs_portal.form_result for each new form_json schema
+    slugs = ['admin-2018', 'emission-2018', 'fuel-2018', 'production-2018']
+    for i in slugs:
+        cursor.execute(
+            '''
+            select id from ggircs_portal.form_json where slug=%s;
+            ''',
+            (i)
+        )
+        res = cursor.fetchone();
+        slug = res[0]
+        cursor.execute(
+            '''
+            insert into ggircs_portal.form_result(form_id, application_id, version_number, form_result, created_at)
+            values ()
+            ''',
+            (slug, app_id, 1, '\{\}', '2019-07-01 00:00:00-07')
+        )
 
 def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, equipment):
     # Parse data from these objects into form_result table with appropriate form_id
