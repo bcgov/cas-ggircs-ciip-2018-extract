@@ -36,10 +36,12 @@ def extract(ciip_book):
                 break
         else :
             quantity = zero_if_not_number(get_sheet_value(emissions_sheet, row, 4))
+            gas_description = get_sheet_value(emissions_sheet, row, 1)
             emissions.append(
                 {
                     "sourceTypeName" : current_emission_cat,
-                    "gasType" : ciip_swim_gas_types.get(get_sheet_value(emissions_sheet, row, 1)),
+                    "gasType" : ciip_swim_gas_types.get(gas_description),
+                    "gasDescription" : gas_description,
                     "annualEmission" : quantity,
                     "annualC02e" : zero_if_not_number(get_sheet_value(emissions_sheet, row, 8))
                 }

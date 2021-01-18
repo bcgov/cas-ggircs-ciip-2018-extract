@@ -31,6 +31,9 @@ def reduce_dicts_array(dicts_array, should_merge_fn):
 
     return dicts_array
 
+def remove_key_from_dict(dictionary, key):
+    return {k:v for k,v in dictionary if k is not key}
+
 
 def get_sheet_value(sheet, row, col, default = None) :
     v = sheet.cell_value(row, col)
