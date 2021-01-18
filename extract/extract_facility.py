@@ -2,8 +2,8 @@ from model.facility import Facility
 import util
 from util import get_sheet_value, none_if_not_number
 
-def extract(ciip_book, cursor, application, operator):
-    facility = Facility(application, operator)
+def extract(ciip_book, cursor, operator):
+    facility = Facility(operator)
 
     admin_sheet = ciip_book.sheet_by_name('Administrative Info')
   

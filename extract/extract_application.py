@@ -6,7 +6,7 @@ from model.application import Application
 import util
 from util import get_sheet_value, search_row_index
 
-def extract(ciip_book, book_path):
+def extract(ciip_book, book_path, facility):
     hasher = hashlib.sha1()
     with open(book_path, 'rb') as afile:
         buf = afile.read()
@@ -22,6 +22,7 @@ def extract(ciip_book, book_path):
     application_type = 'SFO' if 'Production' in ciip_book.sheet_names() else 'LFO'
 
     application = Application(
+                        facility,
                         ntpath.basename(book_path), 
                         hasher.hexdigest(), 
                         datetime.datetime.now(),

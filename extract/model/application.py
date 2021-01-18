@@ -1,6 +1,8 @@
 import datetime
+from .facility import Facility
 
 class Application:
+  facility = None
   source_file_name = ""
   source_sha1 = ""
   imported_at = None
@@ -9,9 +11,11 @@ class Application:
   signature_date = None
   id = 0
 
-  def __init__(self, source_file_name, source_sha1, imported_at, application_year, application_type, signature_date):
+  def __init__(self, facility, source_file_name, source_sha1, imported_at, application_year, application_type, signature_date):
     if application_year != 2018:
       raise ValueError(f'Application year should always be 2018, but was {application_year} in {source_file_name}')
+    
+    self.facility = facility
 
     self.source_file_name = source_file_name
     self.source_sha1 = source_sha1

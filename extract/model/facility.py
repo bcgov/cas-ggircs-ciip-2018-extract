@@ -3,7 +3,6 @@ from .application import Application
 
 class Facility:
   id = 0
-  application = None
   operator = None
 
   name = None
@@ -16,8 +15,7 @@ class Facility:
   production_additional_info = None
   production_public_info = None
 
-  def __init__(self, application, operator):
-    self.application = application
+  def __init__(self, operator):
     self.operator = operator
     return
 
@@ -36,7 +34,7 @@ class Facility:
         '''
         ),
         (
-            self.application.id,
+            self.application.id, # To remove
             self.operator.id,
             self.name,
             self.type,

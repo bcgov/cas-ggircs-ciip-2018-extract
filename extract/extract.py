@@ -40,9 +40,10 @@ def extract_book(blob, cursor):
         print('skipping file ' + blob.name)
         return
 
-    application = extract_application.extract(ciip_book, fileName)
+    facility = extract_facility.extract(ciip_book, cursor)
+    application = extract_application.extract(ciip_book, fileName, facility)
     operator = extract_operator.extract(ciip_book, cursor, application)
-    facility = extract_facility.extract(ciip_book, cursor, application, operator)
+    
     contact_info = extract_contact_info.extract(ciip_book)
     fuel = extract_fuel.extract(ciip_book)
     energy_products = extract_energy.extract(ciip_book)
