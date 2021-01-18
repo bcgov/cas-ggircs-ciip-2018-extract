@@ -1,6 +1,7 @@
 from model.facility import Facility
 from create_json_schema_rows import create_2018_json_schema_forms
 from create_reporting_year import create_2018_reporting_year
+from form_builder import build_administration_form, build_emission_form, build_fuel_form, build_production_form
 import util
 from util import get_sheet_value, none_if_not_number
 
@@ -143,22 +144,22 @@ def create_application(facility, application):
         )
 
 
-def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, equipment):
+def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy):
     # Parse data from these objects into form_result table with appropriate form_id
 
-    # insert into ggircs_portal.form_result(admin info: application, facility, operator, contact)
-    # insert into ggircs_portal.form_result(fuel info: fuel)
-    # insert into ggircs_portal.form_result(emission info: emission)
-    # insert into ggircs_portal.form_result(prod info: production, energy)
-    ...
+    build_administration_form(operator, contact, facility, application)
+    build_emission_form(emission)
+    build_fuel_form(fuel)
+    build_production_form(production, energy)
+
     validate_schema()
 
-def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy, equipment):
+def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy):
     modify_triggers('disable')
     create_2018_reporting_year(cursor)
     create_2018_json_schema_forms(cursor)
-    
-    
+
+
     operator_details = reconcile_operator(operator, application)
     facility_details = reconcile_facility(operator_details, facility)
     application_details = create_application(facility_details, application)
