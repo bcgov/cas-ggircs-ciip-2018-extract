@@ -44,7 +44,13 @@ def reconcile_operator(operator):
     if res in not None:
         operator['ciip_db_id'] = res[0]
     else:
-        # create organisation
+        cursor.execute(
+            '''
+            insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
+            values (%d, %s, %s, %s);
+            ''',
+            (2018, operator['legal_name'], operator['trade_name'], operator['duns'])
+        )
 
 def reconcile_facility(operator, facility):
     # Get id of facility in CIIP db || create facility in CIIP db
@@ -64,13 +70,18 @@ def reconcile_facility(operator, facility):
         else:
             facility['ciip_db_id'] = res[0]
     else:
-        # create facility
+        cursor.execute(
+            '''
+            insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
+            values ((select id from ggircs_portal.organisation order by id desc limit 1), %s, %s, %s);
+            ''',
+            (facility['name'], facility['type'], facility['bcghg_id'])
+        )
 
 def create_application(facility, application):
     # Fully manual, create: application, application_revision, application_revision_status='approved', form_result, form_result_status='approved' X ?
     cursor.execute(insert blah blah application)
-    ...
-    validate_schema()
+
 
 def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, equipment):
     # Parse data from these objects into form_result table with appropriate form_id
@@ -79,6 +90,8 @@ def populate_form_results(application, facility, operator, contact, fuel, emissi
     # insert into ggircs_portal.form_result(fuel info: fuel)
     # insert into ggircs_portal.form_result(emission info: emission)
     # insert into ggircs_portal.form_result(prod info: production, energy)
+    ...
+    validate_schema()
 
 def insert_data(cursor, operator, facility, application, contact, fuel, emission, production, energy, equipment):
     modify_triggers('disable')
