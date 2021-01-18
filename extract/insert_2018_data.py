@@ -112,7 +112,7 @@ def create_application(facility, application):
         ''',
         (app_id, 1, 'approved', '2019-07-01 00:00:00-07')
     )
-    # Create rows in ggircs_portal.form_result for each new form_json schema
+    # Create rows in ggircs_portal.form_result & form_result_status for each new form_json schema
     slugs = ['admin-2018', 'emission-2018', 'fuel-2018', 'production-2018']
     for i in slugs:
         cursor.execute(
@@ -122,14 +122,24 @@ def create_application(facility, application):
             (i)
         )
         res = cursor.fetchone();
-        slug = res[0]
+        form_id = res[0]
+        # Create form_result row
         cursor.execute(
             '''
             insert into ggircs_portal.form_result(form_id, application_id, version_number, form_result, created_at)
-            values ()
+            values (%d, %d, %d, %s, %s)
             ''',
-            (slug, app_id, 1, '\{\}', '2019-07-01 00:00:00-07')
+            (form_id, app_id, 1, '\{\}', '2019-07-01 00:00:00-07')
         )
+        # Create form_result_status row
+        cursor.execute(
+            '''
+            insert into ggircs_portal.form_result_status(form_id, application_id, version_number, form_result_status, created_at)
+            values (%d, %d, %d, %s, %s)
+            ''',
+            (form_id, app_id, 1, 'approved', '2019-07-01 00:00:00-07')
+        )
+
 
 def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy, equipment):
     # Parse data from these objects into form_result table with appropriate form_id
