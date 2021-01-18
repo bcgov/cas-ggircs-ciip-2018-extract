@@ -1,4 +1,5 @@
-
+from jsonschema import validate
+import json
 from extract.model.application import Application
 from extract.model.facility import Facility
 from extract.model.operator import Operator
@@ -6,6 +7,12 @@ from extract.model.operator import Operator
 from .util import remove_key_from_dict
 
 class FormBuilder:
+
+  def validate_form(form, schema_file_name):
+      with open(f'./json_schema/{schema_file_name}') as schema_file:
+        schema = json.load(schema_file)
+        validate(instance=form, schema=schema)
+
 
   def build_administration_form(operator: Operator, contact_info, facility: Facility, application: Application) -> dict:
 
@@ -44,6 +51,8 @@ class FormBuilder:
       "applicationMetadata": app_metadata
     }
 
+    FormBuilder.validate_form(form, 'administration.json')
+
     return form
 
   def build_emission_form(emission_data):
@@ -67,6 +76,8 @@ class FormBuilder:
       "sourceTypes": sourceTypes
     }
 
+    FormBuilder.validate_form(form, 'emission.json')
+
     return form
 
   def build_fuel_form(fuel_data):
@@ -84,10 +95,14 @@ class FormBuilder:
         "associatedEmissions" : fuel.carbon_emissions
       })
 
+    FormBuilder.validate_form(form, 'fuel.json')
+
     return form
 
   def build_production_form(production_data, energy_data):
+    form = production_data + energy_data
+    FormBuilder.validate_form(form, 'production.json')
 
-    return production_data + energy_data
+    return form
 
   

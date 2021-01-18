@@ -1,7 +1,7 @@
 from model.facility import Facility
 from create_json_schema_rows import create_2018_json_schema_forms
 from create_reporting_year import create_2018_reporting_year
-from form_builder import build_administration_form, build_emission_form, build_fuel_form, build_production_form
+from form_builder import FormBuilder
 import util
 from util import get_sheet_value, none_if_not_number
 
@@ -147,10 +147,10 @@ def create_application(facility, application):
 def populate_form_results(application, facility, operator, contact, fuel, emission, production, energy):
     # Parse data from these objects into form_result table with appropriate form_id
 
-    build_administration_form(operator, contact, facility, application)
-    build_emission_form(emission)
-    build_fuel_form(fuel)
-    build_production_form(production, energy)
+    FormBuilder.build_administration_form(operator, contact, facility, application)
+    FormBuilder.build_emission_form(emission)
+    FormBuilder.build_fuel_form(fuel)
+    FormBuilder.build_production_form(production, energy)
 
     validate_schema()
 
