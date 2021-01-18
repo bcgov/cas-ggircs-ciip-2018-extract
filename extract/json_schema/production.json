@@ -11,7 +11,7 @@
           "comments": {
             "type": "string"
           },
-          "name": {
+          "productName": {
             "type": "string",
             "title": "Product Name"
           },

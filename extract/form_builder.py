@@ -46,19 +46,19 @@ class FormBuilder:
 
     return form
 
-  def build_emission_form(emission):
+  def build_emission_form(emission_data):
 
     # Emission is a dictionary 
     #    keys are the source type names
     #    values are lists of gases for that source type
     sourceTypes = []
 
-    for sourceTypeName in emission:
+    for sourceTypeName in emission_data:
       
       sourceTypes.append(
         {
           "sourceTypeName": sourceTypeName,
-          "gases" : list(map(lambda gas_data : remove_key_from_dict(gas_data, 'sourceTypeName'), emission[sourceTypeName]))
+          "gases" : list(map(lambda gas_data : remove_key_from_dict(gas_data, 'sourceTypeName'), emission_data[sourceTypeName]))
         }
       )
 
@@ -68,5 +68,26 @@ class FormBuilder:
     }
 
     return form
+
+  def build_fuel_form(fuel_data):
+
+    form = []
+
+    for fuel in fuel_data:
+      form.append({
+        "comments" : "",
+        "fuelType" : fuel.fuel_type,
+        "fuelTypeAlt" : fuel.fuel_type_alt,
+        "fuelDescription" : fuel.fuel_description,
+        "quantity" : fuel.quantity,
+        "fuelUnits" : fuel.fuel_units,
+        "associatedEmissions" : fuel.carbon_emissions
+      })
+
+    return form
+
+  def build_production_form(production_data, energy_data):
+
+    return production_data + energy_data
 
   
