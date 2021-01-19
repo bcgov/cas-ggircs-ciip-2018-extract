@@ -42,16 +42,32 @@ def find_or_create_operator(cursor, operator):
     if res is not None:
         operator['ciip_db_id'] = res[0]
     else:
+        # Let's see if we have a 2018 insert of this org already
         cursor.execute(
             '''
-            insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
-            values (%s, %s, %s, %s) returning id;
+            select id from organisation
+            where reporting_year=%s
+            and (
+                operator_name=%s
+                or operator_trade_name=%s
+                or duns=%s
+                )
             ''',
-            (2018, operator.legal_name, operator.trade_name, operator.duns)
+            (2018, operator.legal_name, operator.trade_name, operator.duns,)
         )
-        # Get ID of newly created row & save to operator object
-        res = cursor.fetchone()
-        operator.ciip_db_id = res[0]
+
+        # If no matching org, we insert
+        if cursor.fetchone()[0] is None:
+            cursor.execute(
+                '''
+                insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
+                values (%s, %s, %s, %s) returning id;
+                ''',
+                (2018, operator.legal_name, operator.trade_name, operator.duns)
+            )
+            # Get ID of newly created row & save to operator object
+            res = cursor.fetchone()
+            operator.ciip_db_id = res[0]
 
 def find_or_create_facility(cursor, operator, facility):
     # Get id of facility in CIIP db || create facility in CIIP db
