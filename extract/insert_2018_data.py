@@ -50,7 +50,7 @@ def find_or_create_operator(cursor, operator):
             and (
                 operator_name=%s
                 or operator_trade_name=%s
-                or duns=%s
+                or (duns=%s and duns != '123456789')
                 )
             ''',
             (2018, operator.legal_name, operator.trade_name, operator.duns,)
