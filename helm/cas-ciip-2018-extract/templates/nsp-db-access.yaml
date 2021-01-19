@@ -3,8 +3,7 @@ kind: NetworkSecurityPolicy
 apiVersion: security.devops.gov.bc.ca/v1alpha1
 metadata:
   name: {{ include "cas-ciip-2018-extract.name" . }}-ciip-access
-  labels:
-    release: {{ include "cas-ciip-2018-extract.labels" . | nindent 4 }}
+  labels: {{ include "cas-ciip-2018-extract.labels" . | nindent 4 }}
 spec:
   description: allow the job to access the CIIP db
   source:
