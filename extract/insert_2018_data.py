@@ -58,6 +58,7 @@ def find_or_create_operator(cursor, operator):
 
         # If no matching org, we insert
         if cursor.fetchone() is None:
+            print('INSERT ORGANISATION')
             cursor.execute(
                 '''
                 insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
@@ -67,6 +68,8 @@ def find_or_create_operator(cursor, operator):
             )
             # Get ID of newly created row & save to operator object
             res = cursor.fetchone()
+            operator.ciip_db_id = res[0]
+        else:
             operator.ciip_db_id = res[0]
 
 def find_or_create_facility(cursor, operator, facility):
@@ -100,6 +103,7 @@ def find_or_create_facility(cursor, operator, facility):
         )
         res = cursor.fetchone()
         if res is None:
+            print('INSERT FACILITY')
             cursor.execute(
                 '''
                 insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
@@ -109,6 +113,8 @@ def find_or_create_facility(cursor, operator, facility):
             )
             # Get ID of newly created row & save to facility object
             res = cursor.fetchone()
+            facility.ciip_db_id = res[0]
+        else:
             facility.ciip_db_id = res[0]
 
 def create_application(cursor, facility, application):
