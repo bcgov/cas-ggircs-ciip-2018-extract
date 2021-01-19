@@ -39,8 +39,8 @@ def extract(ciip_book, cursor, operator):
             facility.swrs_facility_id = res[0][0]
 
     # Outlier: This partial facility name match is the only way to match this row in the ciip_2018 data to a swrs_id in the swrs data.
-    if 'oda cre' in facility['name'].lower():
-        facility['swrs_facility_id'] = 14235
+    if 'oda cre' in facility.name.lower():
+        facility.swrs_facility_id = 14235
 
     if 'Production' in ciip_book.sheet_names():
         production_sheet = ciip_book.sheet_by_name('Production')

@@ -28,12 +28,12 @@ def get_swrs_id_by_name(operator, cursor):
     )
     res=cursor.fetchall()
     for row in res:
-        if normalize_name(operator['legal_name']) == normalize_name(row[1]) or normalize_name(operator['trade_name']) == normalize_name(row[2]):
-            operator['swrs_operator_id'] = row[0]
+        if normalize_name(operator.legal_name) == normalize_name(row[1]) or normalize_name(operator.trade_name) == normalize_name(row[2]):
+            operator.swrs_operator_id = row[0]
 
 def extract(ciip_book, cursor):
     operator = Operator()
-    
+
     admin_sheet = ciip_book.sheet_by_name('Administrative Info')
 
     duns = get_sheet_value(admin_sheet, 8, 1)
@@ -52,7 +52,7 @@ def extract(ciip_book, cursor):
     operator.duns = duns
     operator.bc_corp_reg = bc_corp_reg
     operator.is_bc_cop_reg_valid = False # overwritten below if true
-   
+
     if bc_corp_reg is not None:
         orgbook_req = requests.get(
             'https://orgbook.gov.bc.ca/api/v2/topic/ident/registration/' + bc_corp_reg + '/formatted')
@@ -77,5 +77,5 @@ def extract(ciip_book, cursor):
             get_swrs_id_by_name(operator, cursor)
     else:
         get_swrs_id_by_name(operator, cursor)
-    
+
     return operator
