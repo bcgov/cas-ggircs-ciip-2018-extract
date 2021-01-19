@@ -87,16 +87,29 @@ def find_or_create_facility(cursor, operator, facility):
         else:
             facility.ciip_db_id = res[0]
     else:
+
         cursor.execute(
             '''
-            insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
-            values (%s, %s, %s, %s) returning id;
+            select id from ggircs_portal.facility
+            where organisation_id=%s
+            and facility_name=%s
+            and facility_type=%s
+            and bcghgid=%s
             ''',
             (operator.ciip_db_id, facility.name, facility.type, facility.bcghg_id)
         )
-        # Get ID of newly created row & save to facility object
         res = cursor.fetchone()
-        facility.ciip_db_id = res[0]
+        if res is None:
+            cursor.execute(
+                '''
+                insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
+                values (%s, %s, %s, %s) returning id;
+                ''',
+                (operator.ciip_db_id, facility.name, facility.type, facility.bcghg_id)
+            )
+            # Get ID of newly created row & save to facility object
+            res = cursor.fetchone()
+            facility.ciip_db_id = res[0]
 
 def create_application(cursor, facility, application):
     # Fully manual, create: application, application_revision, application_revision_status='approved', form_result, form_result_status='approved' X ?
