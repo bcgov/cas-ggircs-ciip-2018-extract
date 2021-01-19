@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "cas-ciip-2018-extract.fullname" . }}-{{ randAlphaNum 5 | lower }}
+  labels: {{ include "cas-ciip-2018-extract.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels: {{ include "cas-ciip-2018-extract.labels" . | nindent 8 }}
+    spec:
+      activeDeadlineSeconds: 3600
+      restartPolicy: Never
+      containers:
+        - env:
+            - name: PGUSER
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password-superuser
+                  name: cas-ciip-portal-patroni
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: database-name
+                  name: cas-ciip-portal
+            - name: PGHOST
+              value: cas-ggircs-patroni
+            - name: PGPORT
+              value: "5432"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/app/gcs/viewer_credentials.json"
+            - name: BUCKET_NAME
+              value: {{ .Release.Namespace }}-{{ .Values.gcs.bucketSuffix }}
+            - name: BUCKET_PATH
+              value: "{{ .Values.gcs.bucketPath }}"
+          name: {{ template "cas-ciip-2018-extract.fullname" . }}-prod-test-restore
+          image: {{ .Values.image.psql.repository }}:{{ .Values.image.psql.tag }}
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 500Mi
+          volumeMounts:
+            - name: gcs-credentials
+              mountPath: /app/gcs
+              readOnly: true
+      volumes:
+        - name: gcs-credentials
+          secret:
+            secretName: gcp-{{ .Release.Namespace }}-{{ .Values.gcs.bucketSuffix }}-service-account-key

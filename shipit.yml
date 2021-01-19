@@ -1,5 +1,3 @@
 deploy:
   override:
-    - git submodule init
-    - git submodule update --remote
     - make install

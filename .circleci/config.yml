@@ -1,97 +1,73 @@
 version: 2.1
 
 orbs:
-  redhat-openshift: circleci/redhat-openshift@0.2.0
+  gcp-gcr: circleci/gcp-gcr@0.7.1
 
 jobs:
-  test-local-cluster:
-    executor: redhat-openshift/machine-for-local-cluster
+  build_and_deploy:
+    executor: gcp-gcr/default
+    parameters:
+      dockerfile:
+        type: string
+        default: Dockerfile
+      image_tag:
+        type: string
+      image_name:
+        type: string
+      cache_version:
+        type: integer
+        default: 1
     steps:
       - checkout
+      - gcp-gcr/gcr-auth
+      - restore_cache:
+          keys:
+            - v<< parameters.cache_version>>-<< parameters.image_name >>-{{ .Branch }}
+          paths:
+            - /tmp/<< parameters.image_name >>.tar
       - run:
-          name: "Pull Submodules"
+          name: Load cache
           command: |
-            git submodule init
-            git submodule update --remote
-      - redhat-openshift/create-local-cluster-with-oc:
-          skip-registry-check: true
-      - redhat-openshift/login-and-update-kubeconfig:
-          insecure-skip-tls-verify: true
-          openshift-platform-version: 3.x
-          password: password
-          server-address: 'https://127.0.0.1:8443'
-          username: dev1
+            set +o pipefail
+            docker load -i /tmp/<< parameters.image_name >>.tar | true
       - run:
-          command: docker login -u "$RED_HAT_DOCKER_USERNAME" -p "$RED_HAT_DOCKER_PASSWORD" "$RED_HAT_DOCKER_SERVER"
-          name: Log in to Red Hat docker registry
+          name: Log in to DockerHub
+          command: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USER --password-stdin registry.hub.docker.com
       - run:
-          command: make provision
-          name: Provision the cluster project set
+          name: Build Docker image
+          command: >-
+            docker build --cache-from=<< parameters.image_name >>
+            -t << parameters.image_name >>:latest
+            -t gcr.io/${GOOGLE_PROJECT_ID}/<< parameters.image_name >>:latest
+            -t gcr.io/${GOOGLE_PROJECT_ID}/<< parameters.image_name >>:v0.36.6
+            -t gcr.io/${GOOGLE_PROJECT_ID}/<< parameters.image_name >>:<< parameters.image_tag >>
+            -f << parameters.dockerfile >>
+            .
       - run:
-          command: make configure
-          name: Configure the cluster
-      - run:
-          command: make build
-          name: Build image on the cluster
-      - run:
-          command: make install-dev
-          name: Deploy to dev
-      - run:
-          command: make install-test
-          name: Deploy to test
-      - run:
-          command: make install-prod
-          name: Deploy to prod
-
-  lint:
-    executor: redhat-openshift/default
-    steps:
-      - checkout
-      - run:
-          name: "Pull Submodules"
+          name: Save Docker image layer cache
           command: |
-            git submodule init
-            git submodule update --remote
-      - redhat-openshift/login-and-update-kubeconfig:
-          insecure-skip-tls-verify: true
-          openshift-platform-version: 3.x
-          server-address: $OC_SERVER_ADDRESS
-          token: $OC_TOKEN
+            docker save -o /tmp/<< parameters.image_name >>.tar << parameters.image_name >>:latest
+      - save_cache:
+          key: v<< parameters.cache_version>>-<< parameters.image_name >>-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /tmp/<< parameters.image_name >>.tar
+      - gcp-gcr/push-image:
+          image: << parameters.image_name >>
+          tag: << parameters.image_tag >>
+          digest-path: /tmp/digest.txt
+      - gcp-gcr/tag-image:
+          image: << parameters.image_name >>
+          source-tag: << parameters.image_tag >>
+          target-tag: latest
       - run:
-          command: make lint
-          name: Lint the openshift yaml
-
-  build:
-    executor: redhat-openshift/default
-    steps:
-      - checkout
-      - run:
-          name: "Pull Submodules"
           command: |
-            git submodule init
-            git submodule update --remote
-      - redhat-openshift/login-and-update-kubeconfig:
-          insecure-skip-tls-verify: true
-          openshift-platform-version: 3.x
-          server-address: $OC_SERVER_ADDRESS
-          token: $OC_TOKEN
-      - run:
-          command: make configure
-          name: Configure imagestream to point at the current SHA1
-      - run:
-          command: make build
-          name: Build image on the remote cluster
+            echo "Digest is: $(</tmp/digest.txt)"
 
 workflows:
-  test:
+  version: 2
+  build:
     jobs:
-      - lint:
+      - build_and_deploy:
           context: cas-pipeline
-      - build:
-          context: cas-pipeline
-          requires:
-            - lint
-      # - test-local-cluster:
-      #     context: cas-pipeline
-      #     requires:
-      #       - lint
+          image_name: cas-ciip-2018-extract
+          image_tag: ${CIRCLE_SHA1}

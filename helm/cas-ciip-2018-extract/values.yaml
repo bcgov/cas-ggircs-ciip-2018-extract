@@ -1,0 +1,16 @@
+gcs:
+  bucketSuffix: ciip-2018
+  bucketPath: "CIIP applications_2018/CIIP data_final"
+
+image:
+  extract:
+    repository: gcr.io/ggl-cas-storage/cas-ciip-2018-extract
+    pullPolicy: Always
+    tag: "latest"
+  casShelf:
+    repository: gcr.io/ggl-cas-storage/cas-shelf-tfe-add-app
+    pullPolicy: Always
+    tag: "0.1"
+
+networkSecurityPolicies:
+  enable: true
