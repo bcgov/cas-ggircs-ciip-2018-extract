@@ -5,7 +5,7 @@ metadata:
   name: {{ include "cas-ciip-2018-extract.name" . }}-egress
   labels: {{ include "cas-ciip-2018-extract.labels" . | nindent 4 }}
 spec:
-  description: allow the trigger pod to talk to do REST requests on airflow public URLs
+  description: allow the job to communicate to external APIs (cloud storage, org book)
   source:
     - - $namespace={{ .Release.Namespace }}
       - app.kubernetes.io/instance={{ include "cas-ciip-2018-extract.name" . }}
