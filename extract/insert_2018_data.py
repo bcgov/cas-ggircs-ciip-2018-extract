@@ -40,7 +40,7 @@ def find_or_create_operator(cursor, operator):
     )
     res = cursor.fetchone()
     if res is not None:
-        operator['ciip_db_id'] = res[0]
+        operator.ciip_db_id = res[0]
     else:
         # Let's see if we have a 2018 insert of this org already
         cursor.execute(
