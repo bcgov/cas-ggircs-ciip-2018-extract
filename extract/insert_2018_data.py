@@ -47,13 +47,9 @@ def find_or_create_operator(cursor, operator):
             '''
             select id from ggircs_portal.organisation
             where reporting_year=%s
-            and (
-                operator_name=%s
-                or operator_trade_name=%s
-                or (duns=%s and duns != '123456789')
-                )
+            and operator_name=%s
             ''',
-            (2018, operator.legal_name, operator.trade_name, operator.duns,)
+            (2018, operator.legal_name,)
         )
 
         res = cursor.fetchone()
@@ -93,7 +89,7 @@ def find_or_create_facility(cursor, operator, facility):
         print(facility.swrs_facility_id)
 
         if operator.ciip_db_id != res[1]:
-            raise exception('Operator ID mismatch. swrs_facility_id: {res[0]}')
+            raise ValueError('Operator ID mismatch. swrs_facility_id: {res[0]}')
         else:
             facility.ciip_db_id = res[0]
     else:
