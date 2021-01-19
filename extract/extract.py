@@ -34,7 +34,9 @@ def extract_book(blob, cursor):
     if not os.path.exists('./tmp'):
         os.makedirs('./tmp')
     fileName = './tmp/' + blob.name.replace("/", "_")
-    blob.download_to_filename(fileName)
+
+    if not os.path.exists(fileName):
+        blob.download_to_filename(fileName)
 
     try:
         ciip_book = xlrd.open_workbook(fileName)
