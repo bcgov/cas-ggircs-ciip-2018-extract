@@ -61,12 +61,14 @@ parser.add_argument('--db', default='ciip')
 parser.add_argument('--host', default='localhost')
 parser.add_argument('--user')
 parser.add_argument('--password')
+parser.add_argument('--bucket')
+parser.add_argument('--dir')
 args = parser.parse_args()
 
 conn = psycopg2.connect(dbname=args.db, host=args.host, user=args.user, password=args.password)
 cur = conn.cursor()
 
-gcs_blobs = list_blobs_in_bucket("ciip-2018", 'CIIP applications_2018/CIIP data_final')
+gcs_blobs = list_blobs_in_bucket(args.bucket, args.dir)
 
 try:
     create_2018_reporting_year(cur)
