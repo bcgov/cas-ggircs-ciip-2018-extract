@@ -33,6 +33,10 @@ def get_swrs_id_by_name(operator, cursor):
         if normalize_name(operator.legal_name) == normalize_name(row[1]) or normalize_name(operator.trade_name) == normalize_name(row[2]):
             operator.swrs_operator_id = row[0]
 
+    # Outlier: inserted name in 2018 was a bit different
+    if "sen Mid" in operator.legal_name.lower():
+        operator.swrs_operator_id = 34008
+
 def extract(ciip_book, cursor):
     operator = Operator()
 
