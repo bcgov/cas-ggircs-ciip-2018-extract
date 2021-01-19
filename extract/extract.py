@@ -76,7 +76,7 @@ try:
 
     for blob in gcs_blobs:
         print('parsing: ' + blob.name)
-    extract_book(blob, cur)
+        extract_book(blob, cur)
 
     conn.commit()
 except Exception as e:
