@@ -45,7 +45,7 @@ def find_or_create_operator(cursor, operator):
         # Let's see if we have a 2018 insert of this org already
         cursor.execute(
             '''
-            select id from organisation
+            select id from ggircs_portal.organisation
             where reporting_year=%s
             and (
                 operator_name=%s
