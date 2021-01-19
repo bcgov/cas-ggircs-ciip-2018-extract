@@ -5,6 +5,8 @@ from model.application import Application
 import util
 from util import get_sheet_value, none_if_not_number
 
+DUNS_EXCLUDE_VALUES = ['000000000', '111111111', '123456789', '0']
+
 def normalize_name(raw):
   normalized_abbrev = {
     'ltd'   : 'limited',
@@ -42,6 +44,8 @@ def extract(ciip_book, cursor):
         duns = duns.replace(' ', '')
     elif duns is not None:
         duns = str(int(duns))
+    if duns in DUNS_EXCLUDE_VALUES:
+        duns = None
 
     bc_corp_reg = get_sheet_value(admin_sheet, 10, 1)
     if bc_corp_reg is not None:
