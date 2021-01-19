@@ -20,14 +20,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password-superuser
-                  name: cas-ciip-portal-patroni
+                  name: {{ .Values.ciip.release }}-patroni
             - name: PGDATABASE
               valueFrom:
                 secretKeyRef:
                   key: database-name
-                  name: cas-ciip-portal
+                  name: {{ .Values.ciip.release }}
             - name: PGHOST
-              value: cas-ggircs-patroni
+              value: {{ .Values.ciip.release }}-patroni
             - name: PGPORT
               value: "5432"
             - name: GOOGLE_APPLICATION_CREDENTIALS
