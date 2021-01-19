@@ -57,7 +57,7 @@ def find_or_create_operator(cursor, operator):
         )
 
         # If no matching org, we insert
-        if cursor.fetchone()[0] is None:
+        if cursor.fetchone() is None:
             cursor.execute(
                 '''
                 insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
