@@ -56,9 +56,11 @@ def find_or_create_operator(cursor, operator):
             (2018, operator.legal_name, operator.trade_name, operator.duns,)
         )
 
+        res = cursor.fetchone()
+
         # If no matching org, we insert
-        if cursor.fetchone() is None:
-            print('INSERT ORGANISATION')
+        if res is None:
+            print('INSERT ORGANISATION           (%s, %s, %s, %s)' % (2018, operator.legal_name, operator.trade_name, operator.duns))
             cursor.execute(
                 '''
                 insert into ggircs_portal.organisation(reporting_year, operator_name, operator_trade_name, duns)
@@ -84,7 +86,12 @@ def find_or_create_facility(cursor, operator, facility):
         (facility.swrs_facility_id,)
     )
     res = cursor.fetchone()
+
     if res is not None:
+        print(res)
+        print(operator.ciip_db_id)
+        print(facility.swrs_facility_id)
+
         if operator.ciip_db_id != res[1]:
             raise exception('Operator ID mismatch. swrs_facility_id: {res[0]}')
         else:
@@ -103,7 +110,7 @@ def find_or_create_facility(cursor, operator, facility):
         )
         res = cursor.fetchone()
         if res is None:
-            print('INSERT FACILITY')
+            print('INSERT FACILITY               (%s, %s, %s, %s)' % (operator.ciip_db_id, facility.name, facility.type, facility.bcghg_id))
             cursor.execute(
                 '''
                 insert into ggircs_portal.facility(organisation_id, facility_name, facility_type, bcghgid)
@@ -119,6 +126,22 @@ def find_or_create_facility(cursor, operator, facility):
 
 def create_application(cursor, facility, application):
     # Fully manual, create: application, application_revision, application_revision_status='approved', form_result, form_result_status='approved' X ?
+
+    cursor.execute(
+        '''
+        select id from ggircs_portal.application
+        where facility_id=%s
+        and reporting_year=%s
+        ''',
+        (facility.ciip_db_id, 2018)
+    )
+    res = cursor.fetchone()
+
+    if res is not None:
+        print("--- 2018 application already exists for facility: %s" % (facility.name))
+        return res[0]
+
+
     # Create row in ggircs_portal.application
     cursor.execute(
         '''
