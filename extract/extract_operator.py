@@ -39,6 +39,8 @@ def get_swrs_id_by_name(operator, cursor):
         operator.swrs_operator_id = 34008
     if "ina emp" in operator.legal_name.lower():
         operator.swrs_operator_id = 31405
+    if 'ver mid' in operator.legal_name.lower():
+        operator.swrs_operator_id = 5485
 
 def extract(ciip_book, cursor):
     operator = Operator()
