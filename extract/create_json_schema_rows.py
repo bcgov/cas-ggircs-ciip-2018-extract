@@ -8,11 +8,12 @@ def load_json_form(path):
     return json.dumps(json_form)
 
 
-def insert(cursor, data):
+def insert(cursor, data, unique_slug):
   cursor.execute(
       '''
-      select slug from ggircs_portal.form_json where slug ilike '%2018' limit 1;
-      '''
+      select slug from ggircs_portal.form_json where slug = %s;
+      ''',
+      (unique_sluq)
   )
   res = cursor.fetchone()
   if res is None:
@@ -34,7 +35,7 @@ def create_2018_json_schema_forms(cursor):
     "Admin form for CIIP 2018",
     admin_json_form
   )
-  insert(cursor, admin_data)
+  insert(cursor, admin_data, 'admin-2018')
 
   # Emission form
   emission_json_form = load_json_form("./json_schema/emission.json")
@@ -45,7 +46,7 @@ def create_2018_json_schema_forms(cursor):
     "Emission form for CIIP 2018",
     emission_json_form
   )
-  insert(cursor, emission_data)
+  insert(cursor, emission_data, 'emission-2018')
 
   # Fuel form
   fuel_json_form = load_json_form("./json_schema/fuel.json")
@@ -56,7 +57,7 @@ def create_2018_json_schema_forms(cursor):
     "Fuel form for CIIP 2018",
     fuel_json_form
   )
-  insert(cursor, fuel_data)
+  insert(cursor, fuel_data, 'fuel-2018')
 
   # Production form# Fuel form
   production_json_form = load_json_form("./json_schema/production.json")
@@ -67,4 +68,4 @@ def create_2018_json_schema_forms(cursor):
     "Production form for CIIP 2018",
     production_json_form
   )
-  insert(cursor, production_data)
+  insert(cursor, production_data, 'production-2018')
