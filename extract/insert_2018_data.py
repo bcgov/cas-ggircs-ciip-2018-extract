@@ -84,11 +84,10 @@ def find_or_create_facility(cursor, operator, facility):
     res = cursor.fetchone()
 
     if res is not None:
-        print(res)
-        print(operator.ciip_db_id)
-        print(facility.swrs_facility_id)
-
         if operator.ciip_db_id != res[1]:
+            print(res)
+            print(operator.ciip_db_id)
+            print(facility.swrs_facility_id)
             raise ValueError('Operator ID mismatch. swrs_facility_id: {res[0]}')
         else:
             facility.ciip_db_id = res[0]
