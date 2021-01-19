@@ -32,7 +32,7 @@ def extract(ciip_book, cursor, operator):
             select distinct swrs_facility_id from swrs.facility
             where lower(facility_name) = %s
             ''',
-            (facility.name,)
+            (str(facility.name).lower(),)
         )
         res = cursor.fetchall()
         if res is not None and len(res) == 1:
