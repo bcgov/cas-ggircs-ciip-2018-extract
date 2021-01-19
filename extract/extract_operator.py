@@ -7,6 +7,7 @@ from util import get_sheet_value, none_if_not_number
 
 DUNS_EXCLUDE_VALUES = ['000000000', '111111111', '123456789', '0']
 
+
 def normalize_name(raw):
   normalized_abbrev = {
     'ltd'   : 'limited',
@@ -36,6 +37,8 @@ def get_swrs_id_by_name(operator, cursor):
     # Outlier: inserted name in 2018 was a bit different
     if "sen mid" in operator.legal_name.lower():
         operator.swrs_operator_id = 34008
+    if "ina emp" in operator.legal_name.lower():
+        operator.swrs_operator_id = 31405
 
 def extract(ciip_book, cursor):
     operator = Operator()
