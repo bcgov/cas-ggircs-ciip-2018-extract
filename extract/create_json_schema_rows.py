@@ -13,7 +13,7 @@ def insert(cursor, data, unique_slug):
       '''
       select slug from ggircs_portal.form_json where slug = %s;
       ''',
-      (unique_sluq)
+      (unique_slug)
   )
   res = cursor.fetchone()
   if res is None:
