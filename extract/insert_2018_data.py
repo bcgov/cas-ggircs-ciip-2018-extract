@@ -119,7 +119,11 @@ def create_application(cursor, facility, application):
             ''',
             (i,)
         )
-        res = cursor.fetchone();
+        res = cursor.fetchone()
+        if res is None:
+            print(slugs)
+            print(i)
+            print(res)
         form_id = res[0]
         # Create form_result row
         cursor.execute(
