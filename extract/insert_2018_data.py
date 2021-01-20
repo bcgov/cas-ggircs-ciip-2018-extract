@@ -167,7 +167,7 @@ def create_application(cursor, facility, application):
     res = cursor.fetchone()
 
     if res is not None:
-        print("--- 2018 application already exists for facility: %s with id %s" % (facility.name, facility.ciip_db_id))
+        print("--- 2018 application already exists for facility: %s with id %s and swrs id %s" % (facility.name, facility.ciip_db_id, facility.swrs_facility_id))
         return res[0]
 
 

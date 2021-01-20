@@ -2,6 +2,10 @@ from model.facility import Facility
 import util
 from util import get_sheet_value, none_if_not_number
 
+# Facilities with a swrs_facility_id that resolves to the wrong one in 2019
+# In particular if facilities have been consolidated from 2018 to 2019
+SWRS_FACILITY_ID_EXCULDE_VALUES = [1667]
+
 def extract(ciip_book, cursor, operator):
     facility = Facility(operator)
 
@@ -24,7 +28,7 @@ def extract(ciip_book, cursor, operator):
     )
 
     res = cursor.fetchone()
-    if res is not None:
+    if res is not None and res[0] not in SWRS_FACILITY_ID_EXCULDE_VALUES:
         facility.swrs_facility_id = res[0]
     else: # try using  the facility name
         cursor.execute(
