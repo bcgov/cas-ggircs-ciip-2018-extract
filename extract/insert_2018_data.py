@@ -70,6 +70,37 @@ def find_or_create_operator(cursor, operator):
         else:
             operator.ciip_db_id = res[0]
 
+# In terms of CIIP org ids, these represent the transfers of ownership,
+# or the hardcoded facilities that can't be resolved.
+# Keyed by swrs_facility_id
+operator_facility_override = {
+    # transfer of ownership:
+    1739: {'ciip_facility_id': 1266, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1661: {'ciip_facility_id': 1267, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1665: {'ciip_facility_id': 1260, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1659: {'ciip_facility_id': 1261, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1660: {'ciip_facility_id': 1262, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1738: {'ciip_facility_id': 1265, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    216: {'ciip_facility_id': 1302, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1743: {'ciip_facility_id': 1257, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    284: {'ciip_facility_id': 1305, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1662: {'ciip_facility_id': 1256, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    1663: {'ciip_facility_id': 1263, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    23390: {'ciip_facility_id': 1306, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    25994: {'ciip_facility_id': 1301, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    27061: {'ciip_facility_id': 1304, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+    283: {'ciip_facility_id': 1059, 'ciip_org_id': 85, 'ciip_2018_org_id': 155},
+
+    333: {'ciip_facility_id': 1523, 'ciip_org_id': 771, 'ciip_2018_org_id': 124},
+    
+    # duplicate org in ciip db
+    1379: {'ciip_facility_id': 1580, 'ciip_org_id': 129},
+    1647: {'ciip_facility_id': 1577, 'ciip_org_id': 129},
+    12755: {'ciip_facility_id': 1582, 'ciip_org_id': 130},
+    13847: {'ciip_facility_id': 1581, 'ciip_org_id': 130}
+}
+
+
 def find_or_create_facility(cursor, operator, facility):
     # Get id of facility in CIIP db || create facility in CIIP db
     # Check that the organisation_id in CIIP db = id from find_or_create_operator
@@ -84,11 +115,14 @@ def find_or_create_facility(cursor, operator, facility):
     res = cursor.fetchone()
 
     if res is not None:
-        if operator.ciip_db_id != res[1]:
-            print(res)
-            print(operator.ciip_db_id)
-            print(facility.swrs_facility_id)
-            raise ValueError('Operator ID mismatch. swrs_facility_id: {res[0]}')
+        if facility.swrs_facility_id in operator_facility_override:
+            facility.ciip_db_id = operator_facility_override[facility.swrs_facility_id]['ciip_facility_id']
+        elif operator.ciip_db_id != res[1]:
+            print(f'Facility {facility.name} was found but supposed to be \nunder org id {res[1]} but was under org id {operator.ciip_db_id} ({operator.legal_name or operator.trade_name})in the ggircs db\n')
+            print(f'swrs_facility_id: {facility.swrs_facility_id}')
+            print(f'CIIP facility id: {res[0]}   organisation_id: {res[1]}')
+            print(f'operator ciip_id:{operator.ciip_db_id}  swrs_id:{operator.swrs_operator_id}')            
+            raise ValueError(f'Operator ID mismatch. swrs_facility_id: {res[0]}')
         else:
             facility.ciip_db_id = res[0]
     else:
@@ -133,7 +167,7 @@ def create_application(cursor, facility, application):
     res = cursor.fetchone()
 
     if res is not None:
-        print("--- 2018 application already exists for facility: %s" % (facility.name))
+        print("--- 2018 application already exists for facility: %s with id %s" % (facility.name, facility.ciip_db_id))
         return res[0]
 
 

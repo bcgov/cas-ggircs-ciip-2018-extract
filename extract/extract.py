@@ -72,12 +72,15 @@ cur = conn.cursor()
 
 gcs_blobs = list_blobs_in_bucket(args.bucket, args.dir)
 
+count = 0
+
 try:
     create_2018_reporting_year(cur)
     create_2018_json_schema_forms(cur)
 
     for blob in gcs_blobs:
-        print('parsing: ' + blob.name)
+        count += 1
+        print(f'{count: 3d} parsing: {blob.name}')
         extract_book(blob, cur)
 
     conn.commit()

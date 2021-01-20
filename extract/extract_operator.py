@@ -5,8 +5,7 @@ from model.application import Application
 import util
 from util import get_sheet_value, none_if_not_number
 
-DUNS_EXCLUDE_VALUES = ['000000000', '111111111', '123456789', '0']
-
+DUNS_EXCLUDE_VALUES = ['000000000', '111111111', '123456789', '0', '201172186', '999999999', '']
 
 def normalize_name(raw):
   normalized_abbrev = {
@@ -31,16 +30,31 @@ def get_swrs_id_by_name(operator, cursor):
     )
     res=cursor.fetchall()
     for row in res:
-        if normalize_name(operator.legal_name) == normalize_name(row[1]) or normalize_name(operator.trade_name) == normalize_name(row[2]):
+        if ((operator.legal_name and normalize_name(operator.legal_name) == normalize_name(row[1])) 
+            or (operator.trade_name and normalize_name(operator.trade_name) == normalize_name(row[2]))):
             operator.swrs_operator_id = row[0]
+            break
 
     # Outlier: inserted name in 2018 was a bit different
-    if "sen mid" in operator.legal_name.lower():
-        operator.swrs_operator_id = 34008
-    if "ina emp" in operator.legal_name.lower():
-        operator.swrs_operator_id = 31405
-    if 'ver mid' in operator.legal_name.lower():
-        operator.swrs_operator_id = 5485
+    if operator.legal_name is not None:
+        if "sen mid" in operator.legal_name.lower():
+            operator.swrs_operator_id = 34008
+        if "ina emp" in operator.legal_name.lower():
+            operator.swrs_operator_id = 31405
+        if 'ver mid' in operator.legal_name.lower():
+            operator.swrs_operator_id = 5485
+        if 'wan ene' in operator.legal_name.lower():
+            operator.swrs_operator_id = 44682
+        if 'ser mil' in operator.legal_name.lower():
+            operator.swrs_operator_id = 5428
+        if 'cop alt' in operator.legal_name.lower():
+            operator.swrs_operator_id = 6471
+        
+        
+        
+    if operator.trade_name is not None:
+        if 'aqa' == operator.trade_name.lower()[1:]:
+            operator.swrs_operator_id = 5582
 
 def extract(ciip_book, cursor):
     operator = Operator()
@@ -75,7 +89,9 @@ def extract(ciip_book, cursor):
             operator.orgbook_legal_name = orgbook_resp['names'][0]['text']
             operator.is_registration_active = not orgbook_resp['names'][0]['inactive']
 
-    if duns is not None:
+    get_swrs_id_by_name(operator, cursor)
+
+    if operator.swrs_operator_id is None and duns is not None:
         cursor.execute(
             """
             select distinct swrs_organisation_id from swrs.organisation
@@ -86,9 +102,5 @@ def extract(ciip_book, cursor):
         res = cursor.fetchone()
         if res is not None:
             operator.swrs_operator_id = res[0]
-        else:
-            get_swrs_id_by_name(operator, cursor)
-    else:
-        get_swrs_id_by_name(operator, cursor)
 
     return operator
