@@ -20,14 +20,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password-superuser
-                  name: cas-ciip-portal-patroni
+                  name: {{ .Values.ciip.release }}-patroni
             - name: PGDATABASE
               valueFrom:
                 secretKeyRef:
                   key: database-name
-                  name: cas-ciip-portal
+                  name: {{ .Values.ciip.release }}
             - name: PGHOST
-              value: cas-ggircs-patroni
+              value: {{ .Values.ciip.release }}-patroni
             - name: PGPORT
               value: "5432"
             - name: GOOGLE_APPLICATION_CREDENTIALS
@@ -37,7 +37,8 @@ spec:
             - name: BUCKET_PATH
               value: "{{ .Values.gcs.bucketPath }}"
           name: {{ template "cas-ciip-2018-extract.fullname" . }}-prod-test-restore
-          image: {{ .Values.image.psql.repository }}:{{ .Values.image.psql.tag }}
+          image: {{ .Values.image.extract.repository }}:{{ .Values.image.extract.tag }}
+          imagePullPolicy: {{ .Values.image.extract.pullPolicy }}
           resources:
             limits:
               cpu: 500m

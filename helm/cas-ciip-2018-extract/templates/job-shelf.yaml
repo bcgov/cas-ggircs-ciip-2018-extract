@@ -1,4 +1,3 @@
-{{- if .Values.swrsImportBucket.enable }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -41,4 +40,3 @@ spec:
                   name: terraform-cloud-workspace
           command: ["bash",  "/script.sh", {{ .Release.Namespace | quote }}, {{ .Values.gcs.bucketSuffix | quote }}]
       restartPolicy: Never
-{{- end }}
