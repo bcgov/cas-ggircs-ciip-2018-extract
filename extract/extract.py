@@ -14,6 +14,7 @@ import extract_fuel
 import extract_emission
 from create_reporting_year import create_2018_reporting_year
 from create_json_schema_rows import create_2018_json_schema_forms
+from create_wizard_rows import create_2018_wizard_rows
 from insert_2018_data import insert_data
 import psycopg2
 
@@ -77,6 +78,7 @@ count = 0
 try:
     create_2018_reporting_year(cur)
     create_2018_json_schema_forms(cur)
+    create_2018_wizard_rows(cur)
 
     for blob in gcs_blobs:
         count += 1
