@@ -12,7 +12,7 @@ image:
     pullPolicy: Always
     tag: "0.1"
 
-networkSecurityPolicies:
+networkPolicies:
   enable: true
 
 ciip:
